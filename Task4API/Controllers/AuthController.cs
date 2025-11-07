@@ -4,6 +4,7 @@ using MyMediator.Types;
 using Task4API.CQRS.CommandDB.Command;
 using Task4API.CQRS.CommandDB.DTO;
 using Task4API.CQRS.CommandDB.Command;
+using MyMediator.Interfaces;
 
 namespace Task4API.Controllers
 {
@@ -11,8 +12,8 @@ namespace Task4API.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly Mediator mediator;
-        public AuthController(MyMediator.Types.Mediator mediator)
+        IMediator mediator;
+        public AuthController(IMediator mediator)
         {
             this.mediator = mediator;
         }

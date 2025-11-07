@@ -1,4 +1,13 @@
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using MyMediator.Extension;
+using MyMediator.Interfaces;
+using MyMediator.Types;
+using System.Reflection;
+using Task4API.CQRS.CommandDB.Command;
+using Task4API.DB;
+
 namespace Task4API
 {
     public class Program
@@ -7,6 +16,33 @@ namespace Task4API
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddSingleton<ItCompany1135Context>();
+            // Add services to the container.
+            builder.Services.AddAuthorization();
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options => {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+
+                        ValidateIssuer = true,
+
+                        ValidIssuer = AuthOptions.ISSUER,
+
+                        ValidateAudience = true,
+
+                        ValidAudience = AuthOptions.AUDIENCE,
+
+                        ValidateLifetime = true,
+
+                        IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
+
+                        ValidateIssuerSigningKey = true,
+                    };
+                });
+
+            builder.Services.AddSingleton<IMediator, Mediator>();
+            builder.Services.AddMediatorHandlers(Assembly.GetExecutingAssembly());
+            builder.Services.AddScoped<LoginCommand.LoginCommandHandler>();
             // Add services to the container.
 
             builder.Services.AddControllers();

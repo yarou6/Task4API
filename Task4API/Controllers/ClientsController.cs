@@ -1,25 +1,37 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MyMediator.Interfaces;
 using MyMediator.Types;
-using Task4API.DB;
+using System.Security.Claims;
 using Task4API.CQRS.CommandDB.Command;
 using Task4API.CQRS.CommandDB.DTO;
+using Task4API.DB;
 namespace Task4API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class ClientsController : ControllerBase
     {
-        private readonly Mediator mediator;
-        public ClientsController(MyMediator.Types.Mediator mediator)
+        IMediator mediator;
+        private readonly ItCompany1135Context db;
+        public ClientsController(IMediator mediator, ItCompany1135Context db)
         {
             this.mediator = mediator;
+            this.db = db;
         }
 
         [HttpPost("clients/register")]
-        public async Task<string> ClientsRegister(string login, string password)
+        public async Task ClientsRegister(ClientDTO clients)
         {
-            var command = new ClientsRegisterCommand() { Login = login, Password = password};
+            var command = new ClientsRegisterCommand() { Client = clients, Claim = User.Claims.First()};
+            await mediator.SendAsync(command);
+            return;
+        }
+
+        [HttpPost("clients/deactivate")]
+        public async Task ClientDeactivate(string id)
+        {
+            var command = new DeactivateClientCommand() { Id = id, Claim = User.Claims.First() };
             await mediator.SendAsync(command);
             return;
         }
